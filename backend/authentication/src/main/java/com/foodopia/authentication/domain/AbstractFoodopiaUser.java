@@ -12,8 +12,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor
+@Getter @Setter
 public class AbstractFoodopiaUser implements UserDetails {
+    private AbstractFoodopiaUser(){}
 
     @Id
     private String userId;

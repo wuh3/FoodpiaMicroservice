@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter @Setter @NoArgsConstructor
 public class Customer extends AbstractFoodopiaUser {
 
-    public Customer(String username, String email, String subscriptionPlan) {
+    public Customer(String username, String email) {
         super();
         this.setUsername(username);
         this.setEmail(email);
