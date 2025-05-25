@@ -14,7 +14,7 @@ import java.util.List;
 
 @Getter @Setter
 public class AbstractFoodopiaUser implements UserDetails {
-    private AbstractFoodopiaUser(){}
+    protected AbstractFoodopiaUser(){}
 
     @Id
     private String userId;
