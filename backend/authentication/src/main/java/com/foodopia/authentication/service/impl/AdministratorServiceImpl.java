@@ -27,7 +27,7 @@ public class AdministratorServiceImpl extends AbstractUserService<Administrator>
         Administrator admin = UserMapper.mapToAdmin(user, new Administrator());
         Optional<Administrator> optionalAdmin = administratorRepository.findByUsername(user.getUsername());
         if (optionalAdmin.isPresent()) {
-            throw new UserAlreadyExistsException("Admin already registered with given mobileNumber "
+            throw new UserAlreadyExistsException("Admin already registered with given username: "
                     +user.getUsername());
         }
         administratorRepository.save(admin);
