@@ -7,7 +7,7 @@ import com.foodopia.authentication.exception.UserAlreadyExistsException;
 
 import java.util.Optional;
 
-public interface UserService {
+public interface IUserService {
     // User lookup methods
     Optional<AbstractFoodopiaUser> findUserByUsername(String username);
     Optional<AbstractFoodopiaUser> findUserByEmail(String email);

@@ -3,7 +3,7 @@ package com.foodopia.authentication.service;
 import com.foodopia.authentication.dto.*;
 import com.foodopia.authentication.exception.UserAlreadyExistsException;
 
-public interface AuthenticationService {
+public interface IAuthenticationService {
     JwtResponse authenticate(String username, String password);
     void registerCustomer(RequestUserDto registrationDto) throws UserAlreadyExistsException;
     void registerAdmin(RequestUserDto registrationDto, String adminLevel) throws UserAlreadyExistsException;

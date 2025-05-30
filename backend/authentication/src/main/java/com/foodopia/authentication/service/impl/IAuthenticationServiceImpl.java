@@ -4,8 +4,8 @@ import com.foodopia.authentication.domain.AbstractFoodopiaUser;
 import com.foodopia.authentication.dto.*;
 import com.foodopia.authentication.exception.UserAlreadyExistsException;
 import com.foodopia.authentication.exception.UserNotFoundException;
-import com.foodopia.authentication.service.AuthenticationService;
-import com.foodopia.authentication.service.UserService;
+import com.foodopia.authentication.service.IAuthenticationService;
+import com.foodopia.authentication.service.IUserService;
 import com.foodopia.authentication.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthenticationServiceImpl implements AuthenticationService {
+public class IAuthenticationServiceImpl implements IAuthenticationService {
 
-    private final UserService userService;
+    private final IUserService IUserService;
     private final JwtUtil jwtUtil;
 
     // In-memory token blacklist (use Redis in production)
@@ -27,10 +27,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public JwtResponse authenticate(String username, String password) {
-        AbstractFoodopiaUser user = userService.findUserByUsername(username)
+        AbstractFoodopiaUser user = IUserService.findUserByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (!userService.validatePassword(password, user.getPassword())) {
+        if (!IUserService.validatePassword(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 
@@ -48,28 +48,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(jwtUtil.getExpirationTime())
-                .userInfo(userService.buildUserInfoResponse(user))
+                .userInfo(IUserService.buildUserInfoResponse(user))
                 .build();
     }
 
     @Override
     public void registerCustomer(RequestUserDto dto) throws UserAlreadyExistsException {
-        userService.createCustomer(dto);
+        IUserService.createCustomer(dto);
     }
 
     @Override
     public void registerAdmin(RequestUserDto dto, String adminLevel) throws UserAlreadyExistsException {
-        userService.createAdmin(dto, adminLevel);
+        IUserService.createAdmin(dto, adminLevel);
     }
 
     @Override
     public void registerOperator(RequestUserDto dto, String department) throws UserAlreadyExistsException {
-        userService.createOperator(dto, department);
+        IUserService.createOperator(dto, department);
     }
 
     @Override
     public void registerKitchenUser(RequestUserDto dto, String station) throws UserAlreadyExistsException {
-        userService.createKitchenUser(dto, station);
+        IUserService.createKitchenUser(dto, station);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             }
 
             String username = jwtUtil.extractUsername(token);
-            AbstractFoodopiaUser user = userService.findUserByUsername(username)
+            AbstractFoodopiaUser user = IUserService.findUserByUsername(username)
                     .orElseThrow(() -> new UserNotFoundException("User not found"));
 
             if (!jwtUtil.validateToken(token, user)) {
@@ -132,7 +132,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             }
 
             String username = jwtUtil.extractUsername(token);
-            AbstractFoodopiaUser user = userService.findUserByUsername(username)
+            AbstractFoodopiaUser user = IUserService.findUserByUsername(username)
                     .orElseThrow(() -> new UserNotFoundException("User not found"));
 
             if (!jwtUtil.validateToken(token, user)) {
@@ -151,7 +151,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .refreshToken(newRefreshToken)
                     .tokenType("Bearer")
                     .expiresIn(jwtUtil.getExpirationTime())
-                    .userInfo(userService.buildUserInfoResponse(user))
+                    .userInfo(IUserService.buildUserInfoResponse(user))
                     .build();
 
         } catch (Exception e) {
@@ -168,14 +168,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void changePassword(String token, String currentPassword, String newPassword) {
         String username = jwtUtil.extractUsername(token);
-        AbstractFoodopiaUser user = userService.findUserByUsername(username)
+        AbstractFoodopiaUser user = IUserService.findUserByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (!userService.validatePassword(currentPassword, user.getPassword())) {
+        if (!IUserService.validatePassword(currentPassword, user.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
         }
 
-        userService.updatePassword(user.getUserId(), newPassword);
+        IUserService.updatePassword(user.getUserId(), newPassword);
         log.info("Password changed for user: {}", username);
     }
 

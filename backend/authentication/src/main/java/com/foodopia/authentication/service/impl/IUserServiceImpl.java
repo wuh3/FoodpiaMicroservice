@@ -7,7 +7,7 @@ import com.foodopia.authentication.entity.*;
 import com.foodopia.authentication.exception.UserAlreadyExistsException;
 import com.foodopia.authentication.exception.UserNotFoundException;
 import com.foodopia.authentication.repository.*;
-import com.foodopia.authentication.service.UserService;
+import com.foodopia.authentication.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class IUserServiceImpl implements IUserService {
 
     private final CustomerRepository customerRepository;
     private final AdministratorRepository administratorRepository;
