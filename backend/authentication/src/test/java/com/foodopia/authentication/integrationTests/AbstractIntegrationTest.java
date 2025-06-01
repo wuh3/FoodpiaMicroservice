@@ -1,5 +1,6 @@
 package com.foodopia.authentication.integrationTests;
 
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -9,9 +10,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
- * Abstract base class for integration tests with MongoDB Testcontainer
+ * Abstract base class for integration tests with MongoDB Testcontainer and MockMvc
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc // Add this to configure MockMvc
 @Testcontainers
 @TestPropertySource(locations = "classpath:application-test.properties")
 public abstract class AbstractIntegrationTest {

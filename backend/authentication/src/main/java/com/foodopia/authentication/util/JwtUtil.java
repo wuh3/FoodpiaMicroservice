@@ -246,7 +246,8 @@ public class JwtUtil {
     // Helper method to safely extract claims without throwing exceptions
     public <T> T safeExtractClaim(String token, Function<Claims, T> claimsResolver, T defaultValue) {
         try {
-            return extractClaim(token, claimsResolver);
+            T result = extractClaim(token, claimsResolver);
+            return result != null ? result : defaultValue;
         } catch (Exception e) {
             log.warn("Failed to extract claim from token: {}", e.getMessage());
             return defaultValue;

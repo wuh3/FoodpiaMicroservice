@@ -72,8 +72,8 @@ class AuthenticationServiceTest {
         // Given
         when(userService.findUserByUsername("testuser")).thenReturn(Optional.of(testCustomer));
         when(userService.validatePassword("Password123", testCustomer.getPassword())).thenReturn(true);
-        when(jwtUtil.generateToken(testCustomer)).thenReturn("jwt-token");
-        when(jwtUtil.generateRefreshToken(testCustomer)).thenReturn("refresh-token");
+        when(jwtUtil.generateToken(eq(testCustomer))).thenReturn("jwt-token"); // Be explicit about the parameter type
+        when(jwtUtil.generateRefreshToken(eq(testCustomer))).thenReturn("refresh-token");
         when(jwtUtil.getExpirationTime()).thenReturn(86400000L);
         when(userService.buildUserInfoResponse(testCustomer)).thenReturn(testUserInfo);
 
@@ -90,8 +90,8 @@ class AuthenticationServiceTest {
 
         verify(userService).findUserByUsername("testuser");
         verify(userService).validatePassword("Password123", testCustomer.getPassword());
-        verify(jwtUtil).generateToken(testCustomer);
-        verify(jwtUtil).generateRefreshToken(testCustomer);
+        verify(jwtUtil).generateToken(eq(testCustomer));
+        verify(jwtUtil).generateRefreshToken(eq(testCustomer));
     }
 
     @Test
@@ -123,7 +123,7 @@ class AuthenticationServiceTest {
 
         verify(userService).findUserByUsername("testuser");
         verify(userService).validatePassword("wrongpassword", testCustomer.getPassword());
-        verify(jwtUtil, never()).generateToken(any());
+        verify(jwtUtil, never()).generateToken(any(AbstractFoodopiaUser.class));
     }
 
     @Test
@@ -141,7 +141,7 @@ class AuthenticationServiceTest {
 
         verify(userService).findUserByUsername("testuser");
         verify(userService).validatePassword("Password123", testCustomer.getPassword());
-        verify(jwtUtil, never()).generateToken(any());
+        verify(jwtUtil, never()).generateToken(any(AbstractFoodopiaUser.class));
     }
 
     @Test
@@ -289,8 +289,8 @@ class AuthenticationServiceTest {
         when(jwtUtil.extractUsername(refreshToken)).thenReturn("testuser");
         when(userService.findUserByUsername("testuser")).thenReturn(Optional.of(testCustomer));
         when(jwtUtil.validateToken(refreshToken, testCustomer)).thenReturn(true);
-        when(jwtUtil.generateToken(testCustomer)).thenReturn("new-jwt-token");
-        when(jwtUtil.generateRefreshToken(testCustomer)).thenReturn("new-refresh-token");
+        when(jwtUtil.generateToken(eq(testCustomer))).thenReturn("new-jwt-token"); // Be explicit about parameter type
+        when(jwtUtil.generateRefreshToken(eq(testCustomer))).thenReturn("new-refresh-token");
         when(jwtUtil.getExpirationTime()).thenReturn(86400000L);
         when(userService.buildUserInfoResponse(testCustomer)).thenReturn(testUserInfo);
 
@@ -308,8 +308,8 @@ class AuthenticationServiceTest {
         verify(jwtUtil).extractUsername(refreshToken);
         verify(userService).findUserByUsername("testuser");
         verify(jwtUtil).validateToken(refreshToken, testCustomer);
-        verify(jwtUtil).generateToken(testCustomer);
-        verify(jwtUtil).generateRefreshToken(testCustomer);
+        verify(jwtUtil).generateToken(eq(testCustomer));
+        verify(jwtUtil).generateRefreshToken(eq(testCustomer));
     }
 
     @Test
