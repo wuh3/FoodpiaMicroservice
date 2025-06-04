@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: foodopia-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-admin123}
+    volumes:
+      - mongodb_data:/data/db
+
+  # Authentication Service
+  auth-service:
+    image: ${AUTH_IMAGE:-whz0000727/foodopia-auth:latest}
+    container_name: foodopia-auth-service
+    network_mode: "host"
+    environment:
+      # Use environment variable for MongoDB URI
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_URI}
+      # JWT Secret from environment
+      JWT_SECRET: ${JWT_SECRET:-defaultSecretKey}
+    depends_on:
+      - mongodb
+volumes:
+  mongodb_data:
