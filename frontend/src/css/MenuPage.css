@@ -1,0 +1,59 @@
+.filter-section {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-pill {
+    background-color: #e9ecef;
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tag-pill:hover {
+    background-color: #dee2e6;
+}
+
+.tag-pill.active {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.clear-search {
+    cursor: pointer;
+    background-color: #f8f9fa;
+    border-left: none;
+}
+
+.filter-count {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.dish-card {
+    transition: transform 0.3s ease;
+    border: 1px solid #dee2e6;
+}
+
+.dish-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.dish-tags {
+    margin-top: 1rem;
+}
+
+.dish-tags .badge {
+    font-weight: normal;
+}

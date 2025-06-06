@@ -1,0 +1,46 @@
+.meal-rating-card {
+  margin-bottom: 2rem;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.meal-rating-card .card-header {
+  background-color: #f8f9fa;
+  border-bottom: none;
+  padding: 1.25rem 1.5rem;
+}
+
+.meal-rating-card .card-header h4 {
+  margin-bottom: 0;
+  color: #333;
+}
+
+.meal-rating-card .card-body {
+  padding: 1.5rem;
+}
+
+.star-rating {
+  display: inline-flex;
+  font-size: 1.5rem;
+  color: #e0e0e0;
+}
+
+.star {
+  margin-right: 0.25rem;
+  transition: color 0.2s;
+}
+
+.star.filled {
+  color: #ffc107;
+}
+
+.dish-name {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .dish-name {
+    margin-bottom: 0;
+  }
+}

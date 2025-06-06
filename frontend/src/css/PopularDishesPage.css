@@ -1,0 +1,44 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css");
+
+.popular-dish-card {
+    border: none;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.popular-dish-image {
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+}
+
+.dish-title {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+.dish-description {
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+.popularity-metrics {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.rating {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+.rating i {
+    margin-right: 0.25rem;
+}
+
+.orders-count {
+    color: #6c757d;
+    font-weight: 500;
+}
+
