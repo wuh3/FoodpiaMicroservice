@@ -1,9 +1,7 @@
 # FoodpiaMicroservice
 ## Problem Statement
-
-## Project Goal
 In today’s fast-paced urban environment, China’s modern working class faces increasing challenges in maintaining healthy and convenient eating habits. Irregular work schedules, limited in-office dining options, unhealthy delivery choices, and fluctuating food prices often make it difficult for individuals to balance nutrition, taste, and convenience.
-
+## Project Goal
 Foodopia is designed to address these pain points by providing a fully customizable meal delivery platform tailored to the evolving needs of urban professionals. Through Foodopia, users can create personalized meal plans based on their dietary preferences, health goals, taste profiles, and work schedules. Each meal is freshly prepared daily, ensuring high quality and timely delivery that adapts to users’ busy lifestyles.
 
 Key features of Foodopia include:
