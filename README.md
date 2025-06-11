@@ -7,11 +7,11 @@ In today’s fast-paced urban environment, China’s modern working class faces 
 Foodopia is designed to address these pain points by providing a fully customizable meal delivery platform tailored to the evolving needs of urban professionals. Through Foodopia, users can create personalized meal plans based on their dietary preferences, health goals, taste profiles, and work schedules. Each meal is freshly prepared daily, ensuring high quality and timely delivery that adapts to users’ busy lifestyles.
 
 Key features of Foodopia include:
-	•	DIY Meal Customization: Users can select ingredients, flavors, portion sizes, and dietary restrictions to build their own meals.
-	•	Health-Focused Options: We collaborate with certified nutritionists to offer balanced meal plans, and introduce exclusive VIP options with premium nutritional guidance.
-	•	Flexible Scheduling: Our platform allows users to easily adjust delivery times, pause or resume plans, and accommodate changing work patterns.
-	•	AI-Powered Personalization: An embedded AI agent continuously learns from user preferences, provides recommendations, and offers personalized meal suggestions to enhance user experience.
-	•	Dynamic Menus: Regular updates to the menu ensure variety, seasonal offerings, and continuous innovation to keep users engaged.
+- DIY Meal Customization: Users can select ingredients, flavors, portion sizes, and dietary restrictions to build their own meals.
+- Health-Focused Options: We collaborate with certified nutritionists to offer balanced meal plans, and introduce exclusive VIP options with premium nutritional guidance.
+- Flexible Scheduling: Our platform allows users to easily adjust delivery times, pause or resume plans, and accommodate changing work patterns.
+- AI-Powered Personalization: An embedded AI agent continuously learns from user preferences, provides recommendations, and offers personalized meal suggestions to enhance user experience.
+- Dynamic Menus: Regular updates to the menu ensure variety, seasonal offerings, and continuous innovation to keep users engaged.
 
 Foodopia’s mission is to bring together technology, nutrition, and convenience to transform daily eating into a seamless, enjoyable, and health-conscious experience for China’s working professionals.
 ## Technologies
