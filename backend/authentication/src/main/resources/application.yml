@@ -1,0 +1,101 @@
+# Authentication Service Configuration
+server:
+  port: 8081
+
+spring:
+  application:
+    name: "authentication-service"
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:default}
+
+  # MongoDB Configuration
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/foodopia}
+
+  # Spring Cloud Config
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+
+  # Spring Cloud Stream Configuration - Following EazyBank Pattern
+  cloud:
+    function:
+      definition: updateNotificationStatus
+    stream:
+      bindings:
+        # Inbound binding - receiving confirmations FROM notification service
+        updateNotificationStatus-in-0:
+          destination: auth-notification-sent
+          group: ${spring.application.name}
+        # Outbound binding - sending events TO notification service
+        sendAuthEvent-out-0:
+          destination: foodopia-auth-events
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKERS:localhost:9092}
+          configuration:
+            security:
+              protocol: PLAINTEXT
+
+  # Security Configuration
+  security:
+    debug: false
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:myDefaultSecretKeyThatShouldBeChangedInProduction123456789}
+  expiration: ${JWT_EXPIRATION:86400000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8070/eureka/}
+    register-with-eureka: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA:true}
+    fetch-registry: ${EUREKA_CLIENT_FETCH_REGISTRY:true}
+  instance:
+    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:true}
+
+# Management/Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+# Logging Configuration
+logging:
+  level:
+    com:
+      foodopia:
+        authentication: DEBUG
+    org:
+      springframework:
+        security: INFO
+        cloud:
+          stream: DEBUG
+        kafka: INFO
+        data:
+          mongodb: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+
+# Info Configuration
+info:
+  app:
+    name: ${spring.application.name}
+    description: "Foodopia Authentication Service"
+    version: "1.0.0"

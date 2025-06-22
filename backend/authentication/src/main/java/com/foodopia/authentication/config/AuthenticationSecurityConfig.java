@@ -60,11 +60,14 @@ public class AuthenticationSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Allow requests from API Gateway and frontend
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:8080", // API Gateway
-                "http://localhost:3000"  // Frontend (React)
-        ));
+        // For development/testing - allow all origins
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+
+        // Or specifically allow your known origins:
+        // configuration.setAllowedOrigins(Arrays.asList(
+        //     "http://localhost:8080", // API Gateway
+        //     "http://localhost:3000"  // Frontend
+        // ));
 
         configuration.setAllowedMethods(Arrays.asList(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS"
@@ -79,7 +82,7 @@ public class AuthenticationSecurityConfig {
         ));
 
         configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L); // Cache preflight for 1 hour
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
