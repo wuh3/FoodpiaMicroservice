@@ -1,0 +1,113 @@
+version: '3.8'
+
+services:
+  # Kafka Service
+  kafka:
+    image: docker.io/bitnami/kafka:3.9
+    container_name: foodopia-kafka
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    networks:
+      - foodopia-network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: foodopia-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - foodopia-network
+
+  # Authentication Service
+  auth-service:
+    image: ${AUTH_IMAGE:-whz0000727/foodopia-auth:latest}
+    container_name: foodopia-auth-service
+    environment:
+      # MongoDB Configuration
+      MONGODB_USERNAME: ${MONGO_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_PASSWORD}
+      MONGODB_HOST: ${MONGODB_HOST}
+      MONGODB_DATABASE: ${MONGODB_DATABASE}
+      MONGODB_APP_NAME: ${MONGODB_APP_NAME}
+
+      # JWT Configuration
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+
+      # Kafka Configuration
+      KAFKA_BROKERS: "kafka:9092"
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
+
+      # Spring Application Configuration
+      SPRING_APPLICATION_NAME: "authentication-service"
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+    depends_on:
+      - mongodb
+      - kafka
+    healthcheck:
+      test: "curl --fail --silent localhost:8081/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - foodopia-network
+    ports:
+      - "8081:8081"
+
+  # Notification Service
+  notification-service:
+    image: ${NOTIFICATION_IMAGE:-whz0000727/foodopia-notification:latest}
+    container_name: foodopia-notification-service
+    environment:
+      # Kafka Configuration
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
+
+      # Spring Application Configuration
+      SPRING_APPLICATION_NAME: "notification"
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+
+      # Service Port
+      SERVER_PORT: 9020
+    depends_on:
+      - kafka
+    healthcheck:
+      test: "curl --fail --silent localhost:9020/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - foodopia-network
+    ports:
+      - "9020:9020"
+
+volumes:
+  mongodb_data:
+    driver: local
+  kafka_data:
+    driver: local
+
+networks:
+  foodopia-network:
+    driver: bridge

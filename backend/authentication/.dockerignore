@@ -50,7 +50,7 @@ docs/
 *.md
 
 # Environment files
-.env
+../.env
 .env.local
 .env.*.local
 
