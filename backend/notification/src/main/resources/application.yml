@@ -1,28 +1,67 @@
+# Notification Service Configuration
 server:
-  port: 9020
+  port: ${SERVER_PORT:9020}
 
 spring:
   application:
-    name: "notification"
+    name: ${SPRING_APPLICATION_NAME:notification}
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:default}
+
+  # MongoDB Atlas Configuration for Foodopia_notification database
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/foodopia_notification}
+
+  # Spring Cloud Stream Configuration for Kafka communication
   cloud:
     function:
       definition: authEmail|authSms
     stream:
       bindings:
+        # Inbound binding - receiving events FROM auth service
         authEmailauthSms-in-0:
           destination: foodopia-auth-events
           group: ${spring.application.name}
+        # Outbound binding - sending confirmations TO auth service
         authEmailauthSms-out-0:
           destination: auth-notification-sent
       kafka:
         binder:
-          brokers:
-            - localhost:9092
+          brokers: ${SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS:localhost:9092}
+          configuration:
+            security:
+              protocol: PLAINTEXT
 
+# Management/Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+  endpoint:
+    health:
+      show-details: always
+
+# Logging Configuration
 logging:
   level:
     com:
       foodopia:
         notification: DEBUG
+    org:
+      springframework:
+        cloud:
+          stream: DEBUG
+        kafka: INFO
+        data:
+          mongodb: INFO
   pattern:
-    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Application Info
+info:
+  app:
+    name: ${spring.application.name}
+    description: "Foodopia Notification Service"
+    version: "1.0.0"

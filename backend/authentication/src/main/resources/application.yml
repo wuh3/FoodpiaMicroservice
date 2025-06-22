@@ -4,20 +4,16 @@ server:
 
 spring:
   application:
-    name: "authentication-service"
+    name: ${SPRING_APPLICATION_NAME:authentication-service}
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:default}
 
-  # MongoDB Configuration
+  # MongoDB Atlas Configuration for Foodopia_auth database
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/foodopia}
 
-  # Spring Cloud Config
-  config:
-    import: "optional:configserver:http://localhost:8071/"
-
-  # Spring Cloud Stream Configuration - Following EazyBank Pattern
+  # Spring Cloud Stream Configuration for Kafka communication
   cloud:
     function:
       definition: updateNotificationStatus
@@ -37,23 +33,19 @@ spring:
             security:
               protocol: PLAINTEXT
 
-  # Security Configuration
-  security:
-    debug: false
-
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET:myDefaultSecretKeyThatShouldBeChangedInProduction123456789}
   expiration: ${JWT_EXPIRATION:86400000}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 
-# Eureka Client Configuration
+# Eureka Client Configuration - disabled for local testing
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8070/eureka/}
-    register-with-eureka: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA:true}
-    fetch-registry: ${EUREKA_CLIENT_FETCH_REGISTRY:true}
+    register-with-eureka: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA:false}
+    fetch-registry: ${EUREKA_CLIENT_FETCH_REGISTRY:false}
   instance:
     prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:true}
 
@@ -62,18 +54,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics,prometheus"
+        include: "health,info,metrics"
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
   health:
     readiness-state:
       enabled: true
     liveness-state:
       enabled: true
-  metrics:
-    tags:
-      application: ${spring.application.name}
 
 # Logging Configuration
 logging:
@@ -83,7 +72,6 @@ logging:
         authentication: DEBUG
     org:
       springframework:
-        security: INFO
         cloud:
           stream: DEBUG
         kafka: INFO
@@ -91,9 +79,8 @@ logging:
           mongodb: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 
-# Info Configuration
+# Application Info
 info:
   app:
     name: ${spring.application.name}
