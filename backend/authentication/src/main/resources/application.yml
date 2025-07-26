@@ -44,8 +44,8 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8070/eureka/}
-    register-with-eureka: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA:false}
-    fetch-registry: ${EUREKA_CLIENT_FETCH_REGISTRY:false}
+    register-with-eureka: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA:true}
+    fetch-registry: ${EUREKA_CLIENT_FETCH_REGISTRY:true}
   instance:
     prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS:true}
 
