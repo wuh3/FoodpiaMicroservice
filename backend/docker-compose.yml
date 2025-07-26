@@ -22,32 +22,63 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
     networks:
       - foodopia-network
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/kafka/bin/kafka-cluster.sh", "cluster-id", "--bootstrap-server=localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # MongoDB Database
-  mongodb:
-    image: mongo:6.0
-    container_name: foodopia-mongodb
-    ports:
-      - "27017:27017"
+  # MongoDB Database - Using MongoDB Atlas (cloud) instead of local container
+  # mongodb:
+  #   image: mongo:6.0
+  #   container_name: foodopia-mongodb
+  #   ports:
+  #     - "27017:27017"
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+  #   volumes:
+  #     - mongodb_data:/data/db
+  #   networks:
+  #     - foodopia-network
+  #   healthcheck:
+  #     test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Eureka Server for service discovery
+  eureka-server:
+    build:
+      context: ./eurekaServer
+      dockerfile: Dockerfile
+    image: ${EUREKA_IMAGE:-foodopia-eureka:latest}
+    container_name: foodopia-eureka-server
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-    volumes:
-      - mongodb_data:/data/db
+      SPRING_APPLICATION_NAME: "eurekaserver"
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      EUREKA_INSTANCE_HOSTNAME: ${EUREKA_INSTANCE_HOSTNAME:-eureka-server}
+    ports:
+      - "8070:8070"
     networks:
       - foodopia-network
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
 
   # Authentication Service
   auth-service:
-    image: ${AUTH_IMAGE:-whz0000727/foodopia-auth:latest}
+    build:
+      context: ./authentication
+      dockerfile: Dockerfile
+    image: ${AUTH_IMAGE:-foodopia-auth:latest}
     container_name: foodopia-auth-service
     environment:
       # MongoDB Configuration
-      MONGODB_USERNAME: ${MONGO_USERNAME}
-      MONGODB_PASSWORD: ${MONGO_PASSWORD}
-      MONGODB_HOST: ${MONGODB_HOST}
-      MONGODB_DATABASE: ${MONGODB_DATABASE}
-      MONGODB_APP_NAME: ${MONGODB_APP_NAME}
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_AUTHENTICATION_URI}
 
       # JWT Configuration
       JWT_SECRET: ${JWT_SECRET}
@@ -61,8 +92,13 @@ services:
       # Spring Application Configuration
       SPRING_APPLICATION_NAME: "authentication-service"
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+
+      # Eureka Configuration
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_DEFAULT_ZONE:-http://eureka-server:8070/eureka/}
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: ${EUREKA_REGISTER_WITH_EUREKA:-true}
+      EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_FETCH_REGISTRY:-true}
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_PREFER_IP_ADDRESS:-true}
     depends_on:
-      - mongodb
       - kafka
     healthcheck:
       test: "curl --fail --silent localhost:8081/actuator/health/readiness | grep UP || exit 1"
@@ -77,9 +113,15 @@ services:
 
   # Notification Service
   notification-service:
-    image: ${NOTIFICATION_IMAGE:-whz0000727/foodopia-notification:latest}
+    build:
+      context: ./notification
+      dockerfile: Dockerfile
+    image: ${NOTIFICATION_IMAGE:-foodopia-notification:latest}
     container_name: foodopia-notification-service
     environment:
+      # MongoDB Configuration - Use MongoDB Atlas (cloud)
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_NOTIFICATION_URI}
+
       # Kafka Configuration
       SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
 
@@ -89,6 +131,12 @@ services:
 
       # Service Port
       SERVER_PORT: 9020
+
+      # Eureka Configuration
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_DEFAULT_ZONE:-http://eureka-server:8070/eureka/}
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: ${EUREKA_REGISTER_WITH_EUREKA:-true}
+      EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_FETCH_REGISTRY:-true}
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_PREFER_IP_ADDRESS:-true}
     depends_on:
       - kafka
     healthcheck:
@@ -102,9 +150,43 @@ services:
     ports:
       - "9020:9020"
 
+  # Meal Service
+  # meal-service:
+  #   build:
+  #     context: ./meal
+  #     dockerfile: Dockerfile
+  #   image: ${MEAL_IMAGE:-foodopia-meal:latest}
+  #   container_name: foodopia-meal-service
+  #   environment:
+  #     # MongoDB Configuration
+  #     SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_MEAL_URI}
+      
+  #     # Spring Configuration
+  #     SPRING_APPLICATION_NAME: "meal-service"
+  #     SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+  #     SERVER_PORT: 8082
+      
+  #     # Eureka Configuration
+  #     EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_DEFAULT_ZONE:-http://eureka-server:8070/eureka/}
+  #     EUREKA_CLIENT_REGISTER_WITH_EUREKA: ${EUREKA_REGISTER_WITH_EUREKA:-true}
+  #     EUREKA_CLIENT_FETCH_REGISTRY: ${EUREKA_FETCH_REGISTRY:-true}
+  #     EUREKA_INSTANCE_PREFER_IP_ADDRESS: ${EUREKA_PREFER_IP_ADDRESS:-true}
+  #   depends_on:
+  #     mongodb:
+  #       condition: service_healthy
+  #     eureka-server:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     test: "curl --fail --silent localhost:8082/actuator/health/readiness | grep UP || exit 1"
+  #     interval: 20s
+  #     timeout: 5s
+  #     retries: 20
+  #     start_period: 10s
+  #   networks:
+  #     - foodopia-network
+  #   ports:
+  #     - "8082:8082"
 volumes:
-  mongodb_data:
-    driver: local
   kafka_data:
     driver: local
 
