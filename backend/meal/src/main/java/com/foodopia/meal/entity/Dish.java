@@ -45,10 +45,6 @@ public class Dish implements IPriceCalculable {
     @Field("serving_size")
     private int servingSize; // in grams
 
-    // Nutritional information
-    @Field("nutritional_info")
-    private NutritionalInfo nutritionalInfo;
-
     // Availability
     @Field("is_available")
     @Indexed
@@ -107,27 +103,4 @@ public class Dish implements IPriceCalculable {
                 .filter(di -> di.getIngredient().getCategory().equals(category))
                 .collect(Collectors.toList());
     }
-}
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-class NutritionalInfo {
-    @Field("calories")
-    private int calories;
-
-    @Field("protein_grams")
-    private double proteinGrams;
-
-    @Field("carbs_grams")
-    private double carbsGrams;
-
-    @Field("fat_grams")
-    private double fatGrams;
-
-    @Field("sodium_mg")
-    private int sodiumMg;
-
-    @Field("fiber_grams")
-    private int fiberGrams;
 }
