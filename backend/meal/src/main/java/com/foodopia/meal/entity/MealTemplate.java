@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "meal_templates")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter @Setter
 public class MealTemplate {
     @Id
