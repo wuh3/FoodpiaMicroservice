@@ -61,16 +61,16 @@ foodopia-kitchen-frontend/
 =========================================================
 =========================================================
 foodopia-backend/
-├── api-gateway/
-├── auth-service/
-├── customer-service/
-├── meal-service/
-├── operations-service/        # Inventory & Customer Service
-├── finance-service/           # Cost & Revenue Accounting
-├── monitoring-service/        # Platform Monitoring
-├── kitchen-service/
-├── notification-service/
-└── shared/
+├── apiGateway/
+├── authentication/
+├── customer/
+├── meal/
+├── operations/        # Inventory & Customer Service
+├── finance/           # Cost & Revenue Accounting
+├── monitoring/        # Platform Monitoring
+├── kitchen/
+├── notification/
+└── delivery/
 ```
 ## Project request flow
 ```
