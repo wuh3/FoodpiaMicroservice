@@ -1,5 +1,14 @@
 package com.foodopia.meal.service.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.foodopia.meal.dto.MealCustomizationDto;
 import com.foodopia.meal.entity.Dish;
 import com.foodopia.meal.entity.MealCustomization;
@@ -8,25 +17,25 @@ import com.foodopia.meal.exception.ResourceNotFoundException;
 import com.foodopia.meal.repository.DishRepository;
 import com.foodopia.meal.repository.MealCustomizationRepository;
 import com.foodopia.meal.service.IMealCustomizationService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
 public class MealCustomizationServiceImpl implements IMealCustomizationService {
 
+    private static final Logger log = LoggerFactory.getLogger(MealCustomizationServiceImpl.class);
     private MealCustomizationRepository customizationRepository;
     private DishRepository dishRepository;
 
     @Override
     public void createCustomization(MealCustomizationDto customizationDto) {
+        log.debug("Creating meal customization for scheduled meal id: {} and user id: {}", 
+                customizationDto.getScheduledMealId(), customizationDto.getUserId());
         // Check if customization already exists for this scheduled meal
         if (customizationRepository.existsByScheduledMealId(customizationDto.getScheduledMealId())) {
+            log.warn("Attempted to create customization that already exists for scheduled meal: {}", 
+                    customizationDto.getScheduledMealId());
             throw new ResourceAlreadyExistsException(
                     "Customization already exists for scheduled meal: " + customizationDto.getScheduledMealId());
         }
@@ -34,7 +43,10 @@ public class MealCustomizationServiceImpl implements IMealCustomizationService {
         // Fetch selected dishes
         List<Dish> dishes = customizationDto.getSelectedDishIds().stream()
                 .map(id -> dishRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Dish", "id", id)))
+                        .orElseThrow(() -> {
+                            log.error("Dish not found during customization creation with id: {}", id);
+                            return new ResourceNotFoundException("Dish", "id", id);
+                        }))
                 .collect(Collectors.toList());
 
         MealCustomization customization = MealCustomization.builder()
@@ -52,20 +64,31 @@ public class MealCustomizationServiceImpl implements IMealCustomizationService {
         customization.setTotalPrice(customization.calculatePrice(0.3)); // 30% markup
 
         customizationRepository.save(customization);
+        log.debug("Successfully created meal customization with id: {} for scheduled meal: {}, total cost: {}, total price: {}", 
+                customization.getId(), customizationDto.getScheduledMealId(), 
+                customization.getTotalCost(), customization.getTotalPrice());
     }
 
     @Override
     public MealCustomizationDto fetchCustomizationByScheduledMeal(String scheduledMealId) {
+        log.debug("Fetching meal customization by scheduled meal id: {}", scheduledMealId);
         MealCustomization customization = customizationRepository.findByScheduledMealId(scheduledMealId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "MealCustomization", "scheduledMealId", scheduledMealId));
+                .orElseThrow(() -> {
+                    log.error("Meal customization not found for scheduled meal id: {}", scheduledMealId);
+                    return new ResourceNotFoundException(
+                            "MealCustomization", "scheduledMealId", scheduledMealId);
+                });
 
+        log.debug("Successfully fetched meal customization with id: {} for scheduled meal: {}", 
+                customization.getId(), scheduledMealId);
         return mapToDto(customization);
     }
 
     @Override
     public List<MealCustomizationDto> fetchCustomizationsByUser(String userId) {
+        log.debug("Fetching meal customizations by user id: {}", userId);
         List<MealCustomization> customizations = customizationRepository.findByUserId(userId);
+        log.debug("Found {} meal customizations for user id: {}", customizations.size(), userId);
         return customizations.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -73,7 +96,9 @@ public class MealCustomizationServiceImpl implements IMealCustomizationService {
 
     @Override
     public List<MealCustomizationDto> fetchCustomizationsByDate(LocalDate deliveryDate) {
+        log.debug("Fetching meal customizations by delivery date: {}", deliveryDate);
         List<MealCustomization> customizations = customizationRepository.findByDeliveryDate(deliveryDate);
+        log.debug("Found {} meal customizations for delivery date: {}", customizations.size(), deliveryDate);
         return customizations.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -81,14 +106,21 @@ public class MealCustomizationServiceImpl implements IMealCustomizationService {
 
     @Override
     public boolean updateCustomization(MealCustomizationDto customizationDto) {
+        log.debug("Updating meal customization with id: {}", customizationDto.getId());
         MealCustomization customization = customizationRepository.findById(customizationDto.getId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "MealCustomization", "id", customizationDto.getId()));
+                .orElseThrow(() -> {
+                    log.error("Meal customization not found for update with id: {}", customizationDto.getId());
+                    return new ResourceNotFoundException(
+                            "MealCustomization", "id", customizationDto.getId());
+                });
 
         // Fetch updated dishes
         List<Dish> dishes = customizationDto.getSelectedDishIds().stream()
                 .map(id -> dishRepository.findById(id)
-                        .orElseThrow(() -> new ResourceNotFoundException("Dish", "id", id)))
+                        .orElseThrow(() -> {
+                            log.error("Dish not found during customization update with id: {}", id);
+                            return new ResourceNotFoundException("Dish", "id", id);
+                        }))
                 .collect(Collectors.toList());
 
         customization.setSelectedDishes(dishes);
@@ -99,6 +131,8 @@ public class MealCustomizationServiceImpl implements IMealCustomizationService {
         customization.setTotalPrice(customization.calculatePrice(0.3));
 
         customizationRepository.save(customization);
+        log.debug("Successfully updated meal customization with id: {}, new total cost: {}, new total price: {}", 
+                customizationDto.getId(), customization.getTotalCost(), customization.getTotalPrice());
         return true;
     }
 

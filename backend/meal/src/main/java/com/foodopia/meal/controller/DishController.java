@@ -1,10 +1,27 @@
 package com.foodopia.meal.controller;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.foodopia.meal.constants.MealConstants;
 import com.foodopia.meal.dto.DishDto;
 import com.foodopia.meal.dto.ErrorResponseDto;
 import com.foodopia.meal.dto.ResponseDto;
 import com.foodopia.meal.service.IDishService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,13 +30,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(
         name = "CRUD REST APIs for Dishes",
@@ -31,6 +41,7 @@ import java.util.List;
 @Validated
 public class DishController {
 
+    private static final Logger log = LoggerFactory.getLogger(DishController.class);
     private IDishService dishService;
 
     @Operation(
@@ -47,7 +58,9 @@ public class DishController {
     })
     @PostMapping("/dishes")
     public ResponseEntity<ResponseDto> createDish(@Valid @RequestBody DishDto dishDto) {
+        log.debug("Received request to create dish: {}", dishDto.getName());
         dishService.createDish(dishDto);
+        log.debug("Successfully created dish: {}", dishDto.getName());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto(MealConstants.STATUS_201, MealConstants.MESSAGE_201));
@@ -67,7 +80,9 @@ public class DishController {
     })
     @GetMapping("/dishes/{id}")
     public ResponseEntity<DishDto> fetchDish(@PathVariable String id) {
+        log.debug("Received request to fetch dish with id: {}", id);
         DishDto dishDto = dishService.fetchDish(id);
+        log.debug("Successfully fetched dish with id: {}", id);
         return ResponseEntity.status(HttpStatus.OK).body(dishDto);
     }
 
@@ -85,7 +100,9 @@ public class DishController {
     })
     @GetMapping("/dishes")
     public ResponseEntity<List<DishDto>> fetchAllDishes() {
+        log.debug("Received request to fetch all dishes");
         List<DishDto> dishes = dishService.fetchAllDishes();
+        log.debug("Successfully fetched {} dishes", dishes.size());
         return ResponseEntity.status(HttpStatus.OK).body(dishes);
     }
 
@@ -103,7 +120,9 @@ public class DishController {
     })
     @GetMapping("/dishes/category/{category}")
     public ResponseEntity<List<DishDto>> fetchDishesByCategory(@PathVariable String category) {
+        log.debug("Received request to fetch dishes by category: {}", category);
         List<DishDto> dishes = dishService.fetchDishesByCategory(category);
+        log.debug("Successfully fetched {} dishes for category: {}", dishes.size(), category);
         return ResponseEntity.status(HttpStatus.OK).body(dishes);
     }
 
@@ -122,12 +141,15 @@ public class DishController {
     })
     @PutMapping("/dishes/{id}")
     public ResponseEntity<ResponseDto> updateDish(@Valid @RequestBody DishDto dishDto) {
+        log.debug("Received request to update dish with id: {}", dishDto.getId());
         boolean isUpdated = dishService.updateDish(dishDto);
         if (isUpdated) {
+            log.debug("Successfully updated dish with id: {}", dishDto.getId());
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(new ResponseDto(MealConstants.STATUS_200, MealConstants.MESSAGE_200));
         } else {
+            log.warn("Failed to update dish with id: {}", dishDto.getId());
             return ResponseEntity
                     .status(HttpStatus.EXPECTATION_FAILED)
                     .body(new ResponseDto(MealConstants.STATUS_417, MealConstants.MESSAGE_417_UPDATE));
