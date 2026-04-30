@@ -5,13 +5,15 @@ import com.foodopia.meal.dto.DishIngredientDto;
 import com.foodopia.meal.dto.IngredientDto;
 import com.foodopia.meal.entity.Dish;
 import com.foodopia.meal.entity.DishIngredient;
+import com.foodopia.meal.entity.Ingredient;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DishMapper {
 
-    public static DishDto mapToDishDto(Dish dish, DishDto dishDto) {
+    public static DishDto mapToDishDto(Dish dish, DishDto dishDto, Map<String, Ingredient> ingredientsById) {
         dishDto.setId(dish.getId());
         dishDto.setName(dish.getName());
         dishDto.setDescription(dish.getDescription());
@@ -25,12 +27,12 @@ public class DishMapper {
         dishDto.setImageUrl(dish.getImageUrl());
         dishDto.setPopularityScore(dish.getPopularityScore());
         dishDto.setTimesOrdered(dish.getTimesOrdered());
-        dishDto.setTotalCost(dish.calculateCost());
+        dishDto.setTotalCost(dish.getTotalCost());
 
         // Map ingredients
         if (dish.getIngredients() != null) {
             dishDto.setIngredients(dish.getIngredients().stream()
-                    .map(DishMapper::mapToDishIngredientDto)
+                    .map(di -> mapToDishIngredientDto(di, ingredientsById))
                     .collect(Collectors.toList()));
         }
 
@@ -63,19 +65,21 @@ public class DishMapper {
         return dish;
     }
 
-    private static DishIngredientDto mapToDishIngredientDto(DishIngredient dishIngredient) {
+    private static DishIngredientDto mapToDishIngredientDto(DishIngredient dishIngredient,
+                                                           Map<String, Ingredient> ingredientsById) {
         DishIngredientDto dto = new DishIngredientDto();
-        dto.setIngredient(IngredientMapper.mapToIngredientDto(
-                dishIngredient.getIngredient(), new IngredientDto()));
+        dto.setIngredientId(dishIngredient.getIngredientId());
+        Ingredient ingredient = ingredientsById.get(dishIngredient.getIngredientId());
+        if (ingredient != null) {
+            dto.setIngredient(IngredientMapper.mapToIngredientDto(ingredient, new IngredientDto()));
+        }
         dto.setQuantity(dishIngredient.getQuantity());
-        dto.setCost(dishIngredient.calculateCost());
         return dto;
     }
 
     private static DishIngredient mapToDishIngredient(DishIngredientDto dto) {
         return new DishIngredient(
-                IngredientMapper.mapToIngredient(dto.getIngredient(),
-                        new com.foodopia.meal.entity.Ingredient(null, null, 0, null, "g")),
+                dto.getIngredientId(),
                 dto.getQuantity()
         );
     }

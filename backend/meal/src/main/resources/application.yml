@@ -13,7 +13,41 @@ spring:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/foodopia_meal}
 
-# Eureka Client Configuration - ENABLED for service discovery
+  # Spring Cloud Stream Configuration for Kafka communication
+  cloud:
+    function:
+      definition: updateKitchenInventory|updateCustomerMeal|updateDeliverySchedule
+    stream:
+      bindings:
+        # Outbound binding - sending inventory updates TO kitchen service
+        sendInventoryUpdate-out-0:
+          destination: meal-inventory-events
+        # Outbound binding - sending meal updates TO customer service
+        sendMealUpdate-out-0:
+          destination: meal-customer-events
+        # Outbound binding - sending delivery requests TO delivery service
+        sendDeliveryRequest-out-0:
+          destination: meal-delivery-events
+        # Inbound binding - receiving inventory confirmations FROM kitchen service
+        updateKitchenInventory-in-0:
+          destination: kitchen-inventory-response
+          group: ${spring.application.name}
+        # Inbound binding - receiving customer confirmations FROM customer service
+        updateCustomerMeal-in-0:
+          destination: customer-meal-response
+          group: ${spring.application.name}
+        # Inbound binding - receiving delivery confirmations FROM delivery service
+        updateDeliverySchedule-in-0:
+          destination: delivery-schedule-response
+          group: ${spring.application.name}
+      kafka:
+        binder:
+          brokers: ${SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS:localhost:9092}
+          configuration:
+            security:
+              protocol: PLAINTEXT
+
+# Eureka Client Configuration
 eureka:
   client:
     service-url:
@@ -28,7 +62,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics"
+        include: "health,info,metrics,prometheus"
   endpoint:
     health:
       show-details: always
@@ -46,6 +80,9 @@ logging:
         meal: DEBUG
     org:
       springframework:
+        cloud:
+          stream: DEBUG
+        kafka: INFO
         data:
           mongodb: INFO
   pattern:
@@ -53,9 +90,6 @@ logging:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   file:
     name: logs/meal-service.log
-    max-size: 10MB
-    max-history: 30
-    total-size-cap: 300MB
 
 # Application Info
 info:

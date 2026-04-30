@@ -1,27 +1,12 @@
 package com.foodopia.meal.entity;
 
-import com.foodopia.meal.domain.IPriceCalculable;
 import lombok.*;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter @Setter
-public class DishIngredient implements IPriceCalculable {
-    private Ingredient ingredient;
+public class DishIngredient {
+    private String ingredientId;
     private double quantity;
-
-
-    @Override
-    public double calculateCost() {
-        return ingredient.getUnitPrice() * quantity;
-    }
-
-    @Override
-    public double calculatePrice(double markup) {
-        return calculateCost() * (1 + markup);
-    }
-
-    public double getCost() {
-        return calculateCost();
-    }
 }

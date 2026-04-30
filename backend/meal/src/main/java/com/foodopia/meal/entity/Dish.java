@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Document(collection = "dishes")
 @CompoundIndexes({
@@ -36,7 +35,11 @@ public class Dish implements IPriceCalculable {
     private String description;
 
     @Field("ingredients")
+    @Builder.Default
     private List<DishIngredient> ingredients = new ArrayList<>();
+
+    @Field("total_cost")
+    private double totalCost;
 
     @Field("category")
     @Indexed
@@ -58,10 +61,12 @@ public class Dish implements IPriceCalculable {
 
     // Dietary tags
     @Field("dietary_tags")
+    @Builder.Default
     private List<String> dietaryTags = new ArrayList<>(); // "vegan", "halal", "gluten-free"
 
     // Allergen information
     @Field("allergens")
+    @Builder.Default
     private List<String> allergens = new ArrayList<>(); // "peanuts", "dairy", "shellfish"
 
     // Media
@@ -84,23 +89,11 @@ public class Dish implements IPriceCalculable {
 
     @Override
     public double calculateCost() {
-        if (ingredients == null || ingredients.isEmpty()) {
-            return 0.0;
-        }
-        return ingredients.stream()
-                .mapToDouble(DishIngredient::calculateCost)
-                .sum();
+        return totalCost;
     }
 
     @Override
     public double calculatePrice(double markup) {
         return calculateCost() * (1 + markup);
-    }
-
-    // Get ingredients by category
-    public List<DishIngredient> getIngredientsByCategory(String category) {
-        return ingredients.stream()
-                .filter(di -> di.getIngredient().getCategory().equals(category))
-                .collect(Collectors.toList());
     }
 }

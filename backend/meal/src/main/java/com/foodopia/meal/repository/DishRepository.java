@@ -4,7 +4,6 @@ import com.foodopia.meal.entity.Dish;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +15,9 @@ public interface DishRepository extends MongoRepository<Dish, String> {
 
     // Find dishes by category
     List<Dish> findByCategory(String category);
+
+    // Find dishes containing an ingredient (embedded list field)
+    List<Dish> findByIngredientsIngredientId(String ingredientId);
 
     // Check if dish exists by name
     boolean existsByName(String name);
