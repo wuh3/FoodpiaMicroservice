@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  meal-service:
+    build:
+      context: ./meal
+      dockerfile: Dockerfile
+    image: ${MEAL_IMAGE:-foodopia-meal:latest}
+    container_name: foodopia-meal-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_APPLICATION_NAME: "meal-service"
+      SERVER_PORT: 8082
+
+      # DB (Atlas or local)
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_MEAL_URI}
+
+      # Turn off dependencies you don't want for DB-only testing
+      EUREKA_CLIENT_ENABLED: "false"
+      SPRING_CLOUD_STREAM_ENABLED: "false"

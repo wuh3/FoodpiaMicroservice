@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.foodopia.meal.dto.DishDto;
 import com.foodopia.meal.entity.Dish;
 import com.foodopia.meal.entity.Ingredient;
+import com.foodopia.meal.entity.NutritionFacts;
 import com.foodopia.meal.exception.ResourceAlreadyExistsException;
 import com.foodopia.meal.exception.ResourceNotFoundException;
 import com.foodopia.meal.mapper.DishMapper;
@@ -43,7 +44,7 @@ public class DishServiceImpl implements IDishService {
         }
 
         Dish dish = DishMapper.mapToDish(dishDto, Dish.builder().build());
-        recalculateAndSetTotalCost(dish);
+        recalculateAndSetDerivedFields(dish);
         dish.setCreatedAt(LocalDateTime.now());
         dish.setUpdatedAt(LocalDateTime.now());
         dishRepository.save(dish);
@@ -102,16 +103,17 @@ public class DishServiceImpl implements IDishService {
                 });
 
         DishMapper.mapToDish(dishDto, dish);
-        recalculateAndSetTotalCost(dish);
+        recalculateAndSetDerivedFields(dish);
         dish.setUpdatedAt(LocalDateTime.now());
         dishRepository.save(dish);
         log.debug("Successfully updated dish with id: {}", dishDto.getId());
         return true;
     }
 
-    private void recalculateAndSetTotalCost(Dish dish) {
+    private void recalculateAndSetDerivedFields(Dish dish) {
         if (dish.getIngredients() == null || dish.getIngredients().isEmpty()) {
             dish.setTotalCost(0.0);
+            dish.setNutritionPerServing(NutritionFacts.zero());
             return;
         }
 
@@ -129,14 +131,25 @@ public class DishServiceImpl implements IDishService {
             }
         }
 
-        double total = dish.getIngredients().stream()
+        double totalCost = dish.getIngredients().stream()
                 .mapToDouble(di -> {
                     Ingredient ingredient = ingredientsById.get(di.getIngredientId());
                     return ingredient.getUnitPrice() * di.getQuantity();
                 })
                 .sum();
 
-        dish.setTotalCost(total);
+        NutritionFacts nutrition = NutritionFacts.zero();
+        for (var di : dish.getIngredients()) {
+            Ingredient ingredient = ingredientsById.get(di.getIngredientId());
+            if (ingredient == null) continue;
+            NutritionFacts per100g = ingredient.getNutritionPer100g();
+            // quantity is treated as grams
+            double scale = di.getQuantity() / 100.0;
+            nutrition.addScaled(per100g, scale);
+        }
+
+        dish.setTotalCost(totalCost);
+        dish.setNutritionPerServing(nutrition);
     }
 
     private Map<String, Ingredient> fetchIngredientsForDish(Dish dish) {

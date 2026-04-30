@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.foodopia.meal.dto.IngredientDto;
 import com.foodopia.meal.entity.Dish;
 import com.foodopia.meal.entity.Ingredient;
+import com.foodopia.meal.entity.NutritionFacts;
 import com.foodopia.meal.exception.ResourceAlreadyExistsException;
 import com.foodopia.meal.exception.ResourceNotFoundException;
 import com.foodopia.meal.mapper.IngredientMapper;
@@ -42,7 +43,7 @@ public class IngredientServiceImpl implements IIngredientService {
         }
 
         Ingredient ingredient = IngredientMapper.mapToIngredient(ingredientDto, new Ingredient(
-                null, null, 0, null, "g"));
+                null, null, 0, null, "g", null));
         ingredientRepository.save(ingredient);
         log.debug("Successfully created ingredient with id: {} and name: {}", ingredient.getId(), ingredient.getName());
     }
@@ -111,14 +112,18 @@ public class IngredientServiceImpl implements IIngredientService {
 
                 for (Dish dish : affectedDishes) {
                     double total = 0.0;
+                    NutritionFacts nutrition = NutritionFacts.zero();
                     if (dish.getIngredients() != null) {
                         for (var di : dish.getIngredients()) {
                             Ingredient ing = ingredientsById.get(di.getIngredientId());
                             if (ing == null) continue;
                             total += ing.getUnitPrice() * di.getQuantity();
+                            double scale = di.getQuantity() / 100.0;
+                            nutrition.addScaled(ing.getNutritionPer100g(), scale);
                         }
                     }
                     dish.setTotalCost(total);
+                    dish.setNutritionPerServing(nutrition);
                 }
                 dishRepository.saveAll(affectedDishes);
                 log.debug("Recalculated totalCost for {} dishes affected by ingredient {}", affectedDishes.size(), id);

@@ -42,4 +42,6 @@ public class DishDto {
     private int timesOrdered;
 
     private double totalCost;
+
+    private NutritionFactsDto nutritionPerServing;
 }

@@ -41,6 +41,9 @@ public class Dish implements IPriceCalculable {
     @Field("total_cost")
     private double totalCost;
 
+    @Field("nutrition_per_serving")
+    private NutritionFacts nutritionPerServing;
+
     @Field("category")
     @Indexed
     private String category; // "meat", "vegetable", "soup", "grain", "dessert"

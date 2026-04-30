@@ -22,6 +22,13 @@ public class Ingredient implements IPriceCalculable {
     private String category;
     private String unit = "g";
 
+    /**
+     * Nutrition density per 100g.
+     * Dish nutrition is computed from this + DishIngredient.quantity (grams).
+     */
+    @Field("nutrition_per_100g")
+    private NutritionFacts nutritionPer100g;
+
     @Override
     public double calculateCost() {
         return this.unitPrice;

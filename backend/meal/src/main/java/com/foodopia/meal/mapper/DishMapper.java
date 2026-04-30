@@ -3,6 +3,7 @@ package com.foodopia.meal.mapper;
 import com.foodopia.meal.dto.DishDto;
 import com.foodopia.meal.dto.DishIngredientDto;
 import com.foodopia.meal.dto.IngredientDto;
+import com.foodopia.meal.dto.NutritionFactsDto;
 import com.foodopia.meal.entity.Dish;
 import com.foodopia.meal.entity.DishIngredient;
 import com.foodopia.meal.entity.Ingredient;
@@ -28,6 +29,8 @@ public class DishMapper {
         dishDto.setPopularityScore(dish.getPopularityScore());
         dishDto.setTimesOrdered(dish.getTimesOrdered());
         dishDto.setTotalCost(dish.getTotalCost());
+        dishDto.setNutritionPerServing(
+                NutritionMapper.mapToDto(dish.getNutritionPerServing(), new NutritionFactsDto()));
 
         // Map ingredients
         if (dish.getIngredients() != null) {

@@ -19,4 +19,6 @@ public class IngredientDto {
     private String category;
 
     private String unit;
+
+    private NutritionFactsDto nutritionPer100g;
 }
