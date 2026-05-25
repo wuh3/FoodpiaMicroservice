@@ -12,7 +12,7 @@
 	<artifactId>customer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>customer</name>
-	<description>Customer subscription &amp; profile microservice for Foodopia</description>
+	<description>Customer subscription, profile, address, and payment microservice for Foodopia</description>
 	<url/>
 	<licenses>
 		<license/>
