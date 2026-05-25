@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  scheduling-service:
+    build:
+      context: ./scheduling
+      dockerfile: Dockerfile
+    image: ${SCHEDULING_IMAGE:-foodopia-scheduling:latest}
+    container_name: foodopia-scheduling-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_APPLICATION_NAME: "scheduling-service"
+      SERVER_PORT: 8084
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_SCHEDULING_URI}
+    healthcheck:
+      test: "curl --fail --silent localhost:8084/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
