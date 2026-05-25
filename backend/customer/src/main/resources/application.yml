@@ -1,0 +1,43 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:customer-service}
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:default}
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/Foodopia_customer}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+
+logging:
+  level:
+    com:
+      foodopia:
+        customer: DEBUG
+    org:
+      springframework:
+        data:
+          mongodb: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+info:
+  app:
+    name: ${spring.application.name}
+    description: "Foodopia Customer Service"
+    version: "0.0.1-SNAPSHOT"

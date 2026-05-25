@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  customer-service:
+    build:
+      context: ./customer
+      dockerfile: Dockerfile
+    image: ${CUSTOMER_IMAGE:-foodopia-customer:latest}
+    container_name: foodopia-customer-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_APPLICATION_NAME: "customer-service"
+      SERVER_PORT: 8083
+      SPRING_DATA_MONGODB_URI: ${SPRING_DATA_MONGODB_CUSTOMER_URI}
+    healthcheck:
+      test: "curl --fail --silent localhost:8083/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
