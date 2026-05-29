@@ -48,3 +48,12 @@ The central user information management place. It should allow user to add, modi
 1. Default payment option
 2. credits
 3. Credit cards
+
+## Functional Requirements
+
+1. User should be able to view and update personal information
+2. User should be able to view and update Diet Preference. Diet goal can be multiple tags
+3. User should be able to view, add, update, and cancel subscription
+   1. For each subscription, user should be able to view the destails (such as number of meals per month, number of meals left for current month, the meal template for each meal, need to communicate with Meal Service )
+   2. For each subscription, an optional delivery schedule can be added, updated, and deleted. A delivery schedule should work like a calendar. User can assign meal delivery on valid time slots everyday (like 11:30am for lunch on Monday 05/25/2026). User may or may not fully assign all the meal quota for the month. 
+      1. Each delivery on the calendar can be customized: meal content, delivery address

@@ -20,6 +20,13 @@ public interface IIngredientService {
     IngredientDto fetchIngredient(String id);
 
     /**
+     * Fetch ingredient details by unique name
+     * @param name - Ingredient name
+     * @return IngredientDto
+     */
+    IngredientDto fetchIngredientByName(String name);
+
+    /**
      * Fetch all ingredients
      * @return List of IngredientDto
      */

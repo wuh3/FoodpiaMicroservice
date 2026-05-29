@@ -8,6 +8,22 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:default}
 
+  ai:
+    mcp:
+      server:
+        name: meal-mcp-server
+        version: 1.0.0
+        type: SYNC
+        instructions: "MCP server for the Foodopia meal catalog (dishes and ingredients)"
+        protocol: STREAMABLE
+        capabilities:
+          tool: true
+          resource: false
+          prompt: false
+          completion: false
+        streamable-http:
+          mcp-endpoint: /mcp
+
   # MongoDB Configuration for Foodopia_meal database
   data:
     mongodb:

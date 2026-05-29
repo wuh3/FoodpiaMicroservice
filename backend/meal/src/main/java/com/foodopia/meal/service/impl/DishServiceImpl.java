@@ -72,12 +72,7 @@ public class DishServiceImpl implements IDishService {
         log.debug("Fetching all dishes");
         List<Dish> dishes = dishRepository.findAll();
         log.debug("Found {} dishes", dishes.size());
-        Map<String, Ingredient> ingredientsById = fetchIngredientsForDishes(dishes);
-        List<DishDto> dtos = dishes.stream()
-                .map(dish -> DishMapper.mapToDishDto(dish, new DishDto(), ingredientsById))
-                .collect(Collectors.toList());
-        dtos.forEach(this::setIngredientLineCosts);
-        return dtos;
+        return mapDishesToDtos(dishes);
     }
 
     @Override
@@ -85,12 +80,41 @@ public class DishServiceImpl implements IDishService {
         log.debug("Fetching dishes by category: {}", category);
         List<Dish> dishes = dishRepository.findByCategory(category);
         log.debug("Found {} dishes in category: {}", dishes.size(), category);
-        Map<String, Ingredient> ingredientsById = fetchIngredientsForDishes(dishes);
-        List<DishDto> dtos = dishes.stream()
-                .map(dish -> DishMapper.mapToDishDto(dish, new DishDto(), ingredientsById))
-                .collect(Collectors.toList());
-        dtos.forEach(this::setIngredientLineCosts);
-        return dtos;
+        return mapDishesToDtos(dishes);
+    }
+
+    @Override
+    public List<DishDto> fetchDishesByDietaryTag(String dietaryTag) {
+        log.debug("Fetching dishes by dietary tag: {}", dietaryTag);
+        List<Dish> dishes = dishRepository.findByDietaryTagsContainingIgnoreCase(dietaryTag);
+        log.debug("Found {} dishes with dietary tag: {}", dishes.size(), dietaryTag);
+        return mapDishesToDtos(dishes);
+    }
+
+    @Override
+    public List<DishDto> fetchDishesByMinPopularityScore(double minPopularityScore) {
+        log.debug("Fetching dishes with popularity score >= {}", minPopularityScore);
+        List<Dish> dishes = dishRepository.findByPopularityScoreGreaterThanEqual(minPopularityScore);
+        log.debug("Found {} dishes with popularity score >= {}", dishes.size(), minPopularityScore);
+        return mapDishesToDtos(dishes);
+    }
+
+    @Override
+    public List<DishDto> fetchDishesByIngredientId(String ingredientId) {
+        log.debug("Fetching dishes by ingredient id: {}", ingredientId);
+        ingredientRepository.findById(ingredientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ingredient", "id", ingredientId));
+        List<Dish> dishes = dishRepository.findByIngredientsIngredientId(ingredientId);
+        log.debug("Found {} dishes containing ingredient id: {}", dishes.size(), ingredientId);
+        return mapDishesToDtos(dishes);
+    }
+
+    @Override
+    public List<DishDto> fetchDishesByIngredientName(String ingredientName) {
+        log.debug("Fetching dishes by ingredient name: {}", ingredientName);
+        Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(ingredientName)
+                .orElseThrow(() -> new ResourceNotFoundException("Ingredient", "name", ingredientName));
+        return fetchDishesByIngredientId(ingredient.getId());
     }
 
     @Override
@@ -108,6 +132,15 @@ public class DishServiceImpl implements IDishService {
         dishRepository.save(dish);
         log.debug("Successfully updated dish with id: {}", dishDto.getId());
         return true;
+    }
+
+    private List<DishDto> mapDishesToDtos(List<Dish> dishes) {
+        Map<String, Ingredient> ingredientsById = fetchIngredientsForDishes(dishes);
+        List<DishDto> dtos = dishes.stream()
+                .map(dish -> DishMapper.mapToDishDto(dish, new DishDto(), ingredientsById))
+                .collect(Collectors.toList());
+        dtos.forEach(this::setIngredientLineCosts);
+        return dtos;
     }
 
     private void recalculateAndSetDerivedFields(Dish dish) {

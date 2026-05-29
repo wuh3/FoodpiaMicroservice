@@ -16,6 +16,12 @@ public interface DishRepository extends MongoRepository<Dish, String> {
     // Find dishes by category
     List<Dish> findByCategory(String category);
 
+    // Find dishes that include a dietary tag (case-insensitive, e.g. vegan, gluten-free)
+    List<Dish> findByDietaryTagsContainingIgnoreCase(String dietaryTag);
+
+    // Find dishes at or above a minimum popularity score
+    List<Dish> findByPopularityScoreGreaterThanEqual(double minPopularityScore);
+
     // Find dishes containing an ingredient (embedded list field)
     List<Dish> findByIngredientsIngredientId(String ingredientId);
 

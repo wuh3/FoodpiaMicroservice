@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.foodopia.meal.constants.MealConstants;
@@ -123,6 +124,87 @@ public class DishController {
         log.debug("Received request to fetch dishes by category: {}", category);
         List<DishDto> dishes = dishService.fetchDishesByCategory(category);
         log.debug("Successfully fetched {} dishes for category: {}", dishes.size(), category);
+        return ResponseEntity.status(HttpStatus.OK).body(dishes);
+    }
+
+    @Operation(
+            summary = "Fetch Dishes by Dietary Tag REST API",
+            description = "REST API to fetch dishes that include a dietary tag"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "HTTP Status OK"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            )
+    })
+    @GetMapping("/dishes/dietary-tag/{tag}")
+    public ResponseEntity<List<DishDto>> fetchDishesByDietaryTag(@PathVariable String tag) {
+        log.debug("Received request to fetch dishes by dietary tag: {}", tag);
+        List<DishDto> dishes = dishService.fetchDishesByDietaryTag(tag);
+        log.debug("Successfully fetched {} dishes for dietary tag: {}", dishes.size(), tag);
+        return ResponseEntity.status(HttpStatus.OK).body(dishes);
+    }
+
+    @Operation(
+            summary = "Fetch Dishes by Popularity Score REST API",
+            description = "REST API to fetch dishes with popularity score at or above the minimum"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "HTTP Status OK"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            )
+    })
+    @GetMapping("/dishes/popularity")
+    public ResponseEntity<List<DishDto>> fetchDishesByMinPopularityScore(
+            @RequestParam double minScore) {
+        log.debug("Received request to fetch dishes with popularity score >= {}", minScore);
+        List<DishDto> dishes = dishService.fetchDishesByMinPopularityScore(minScore);
+        log.debug("Successfully fetched {} dishes with popularity score >= {}", dishes.size(), minScore);
+        return ResponseEntity.status(HttpStatus.OK).body(dishes);
+    }
+
+    @Operation(
+            summary = "Fetch Dishes by Ingredient ID REST API",
+            description = "REST API to fetch dishes that include an ingredient"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "HTTP Status OK"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            )
+    })
+    @GetMapping("/dishes/ingredient/{ingredientId}")
+    public ResponseEntity<List<DishDto>> fetchDishesByIngredientId(@PathVariable String ingredientId) {
+        log.debug("Received request to fetch dishes by ingredient id: {}", ingredientId);
+        List<DishDto> dishes = dishService.fetchDishesByIngredientId(ingredientId);
+        log.debug("Successfully fetched {} dishes for ingredient id: {}", dishes.size(), ingredientId);
+        return ResponseEntity.status(HttpStatus.OK).body(dishes);
+    }
+
+    @Operation(
+            summary = "Fetch Dishes by Ingredient Name REST API",
+            description = "REST API to fetch dishes that include an ingredient, resolved by unique ingredient name"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "HTTP Status OK"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            )
+    })
+    @GetMapping("/dishes/ingredient")
+    public ResponseEntity<List<DishDto>> fetchDishesByIngredientName(@RequestParam String name) {
+        log.debug("Received request to fetch dishes by ingredient name: {}", name);
+        List<DishDto> dishes = dishService.fetchDishesByIngredientName(name);
+        log.debug("Successfully fetched {} dishes for ingredient name: {}", dishes.size(), name);
         return ResponseEntity.status(HttpStatus.OK).body(dishes);
     }
 

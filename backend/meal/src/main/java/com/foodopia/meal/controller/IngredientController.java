@@ -88,6 +88,26 @@ public class IngredientController {
     }
 
     @Operation(
+            summary = "Fetch Ingredient by Name REST API",
+            description = "REST API to fetch ingredient details by unique name"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "HTTP Status OK"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "HTTP Status Internal Server Error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+            )
+    })
+    @GetMapping("/ingredients/by-name")
+    public ResponseEntity<IngredientDto> fetchIngredientByName(@RequestParam String name) {
+        log.debug("Received request to fetch ingredient with name: {}", name);
+        IngredientDto ingredientDto = ingredientService.fetchIngredientByName(name);
+        log.debug("Successfully fetched ingredient with name: {}", name);
+        return ResponseEntity.status(HttpStatus.OK).body(ingredientDto);
+    }
+
+    @Operation(
             summary = "Fetch All Ingredients REST API",
             description = "REST API to fetch all ingredients"
     )

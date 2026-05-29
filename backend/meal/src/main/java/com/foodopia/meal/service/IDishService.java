@@ -2,7 +2,6 @@ package com.foodopia.meal.service;
 
 import com.foodopia.meal.dto.DishDto;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface IDishService {
@@ -32,6 +31,34 @@ public interface IDishService {
      * @return List of DishDto
      */
     List<DishDto> fetchDishesByCategory(String category);
+
+    /**
+     * Fetch dishes that include a dietary tag
+     * @param dietaryTag - Dietary tag (e.g. vegan, halal, gluten-free)
+     * @return List of DishDto
+     */
+    List<DishDto> fetchDishesByDietaryTag(String dietaryTag);
+
+    /**
+     * Fetch dishes with popularity score at or above the minimum
+     * @param minPopularityScore - Minimum popularity score (inclusive)
+     * @return List of DishDto
+     */
+    List<DishDto> fetchDishesByMinPopularityScore(double minPopularityScore);
+
+    /**
+     * Fetch dishes that include an ingredient
+     * @param ingredientId - Ingredient ID
+     * @return List of DishDto
+     */
+    List<DishDto> fetchDishesByIngredientId(String ingredientId);
+
+    /**
+     * Fetch dishes that include an ingredient, resolved by unique ingredient name
+     * @param ingredientName - Ingredient name
+     * @return List of DishDto
+     */
+    List<DishDto> fetchDishesByIngredientName(String ingredientName);
 
     /**
      * Update dish details

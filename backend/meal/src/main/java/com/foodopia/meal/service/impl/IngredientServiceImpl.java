@@ -36,7 +36,7 @@ public class IngredientServiceImpl implements IIngredientService {
     public void createIngredient(IngredientDto ingredientDto) {
         log.debug("Creating ingredient with name: {}", ingredientDto.getName());
         // Check if ingredient already exists
-        if (ingredientRepository.existsByName(ingredientDto.getName())) {
+        if (ingredientRepository.existsByNameIgnoreCase(ingredientDto.getName())) {
             log.warn("Attempted to create ingredient that already exists: {}", ingredientDto.getName());
             throw new ResourceAlreadyExistsException(
                     "Ingredient already exists with name: " + ingredientDto.getName());
@@ -58,6 +58,18 @@ public class IngredientServiceImpl implements IIngredientService {
                 });
 
         log.debug("Successfully fetched ingredient with id: {} and name: {}", id, ingredient.getName());
+        return IngredientMapper.mapToIngredientDto(ingredient, new IngredientDto());
+    }
+
+    @Override
+    public IngredientDto fetchIngredientByName(String name) {
+        log.debug("Fetching ingredient with name: {}", name);
+        Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> {
+                    log.error("Ingredient not found with name: {}", name);
+                    return new ResourceNotFoundException("Ingredient", "name", name);
+                });
+        log.debug("Successfully fetched ingredient with name: {} and id: {}", name, ingredient.getId());
         return IngredientMapper.mapToIngredientDto(ingredient, new IngredientDto());
     }
 
