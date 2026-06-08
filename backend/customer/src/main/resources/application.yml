@@ -6,6 +6,23 @@ spring:
     name: ${SPRING_APPLICATION_NAME:customer-service}
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:default}
+
+  ai:
+    mcp:
+      server:
+        name: customer-mcp-server
+        version: 1.0.0
+        type: SYNC
+        instructions: "MCP server for Foodopia customer profiles and subscriptions"
+        protocol: STREAMABLE
+        capabilities:
+          tool: true
+          resource: false
+          prompt: false
+          completion: false
+        streamable-http:
+          mcp-endpoint: /mcp
+
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/Foodopia_customer}
