@@ -1,5 +1,8 @@
 package com.foodopia.customer.service.impl;
 
+import com.foodopia.customer.client.MealServiceClient;
+import com.foodopia.customer.client.dto.MealPlanTypeClientDto;
+import com.foodopia.customer.client.dto.PlanLevelClientDto;
 import com.foodopia.customer.dto.UserSubscriptionDto;
 import com.foodopia.customer.entity.UserSubscription;
 import com.foodopia.customer.entity.enums.SubscriptionStatus;
@@ -23,12 +26,27 @@ public class UserSubscriptionServiceImpl implements IUserSubscriptionService {
     private static final Logger log = LoggerFactory.getLogger(UserSubscriptionServiceImpl.class);
 
     private final UserSubscriptionRepository subscriptionRepository;
+    private final MealServiceClient mealServiceClient;
 
     @Override
     public void createSubscription(UserSubscriptionDto subscriptionDto) {
-        log.debug("Creating subscription for userId: {}", subscriptionDto.getUserId());
+        log.debug("Creating subscription for userId: {} with planCode: {} and planLevel: {}",
+                subscriptionDto.getUserId(), subscriptionDto.getPlanCode(), subscriptionDto.getPlanLevel());
+
+        MealPlanTypeClientDto mealPlanType = mealServiceClient.fetchMealPlanType(subscriptionDto.getPlanCode());
+        int requestedLevel = subscriptionDto.getPlanLevel();
+        PlanLevelClientDto resolvedLevel = mealPlanType.getLevels().stream()
+                .filter(level -> level.getLevel() == requestedLevel)
+                .findFirst()
+                .orElseThrow(() -> new InvalidSubscriptionStateException(
+                        "Plan level " + requestedLevel + " not found for planCode: " + mealPlanType.getPlanCode()));
+
         UserSubscription subscription = UserSubscriptionMapper.mapToEntity(
                 subscriptionDto, UserSubscription.builder().build());
+        subscription.setMealsPerMonth(resolvedLevel.getMealsPerMonth());
+        if (subscription.getPlanName() == null || subscription.getPlanName().isBlank()) {
+            subscription.setPlanName(mealPlanType.getDisplayName());
+        }
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         subscriptionRepository.save(subscription);
         log.debug("Created subscription with id: {}", subscription.getId());
@@ -54,6 +72,9 @@ public class UserSubscriptionServiceImpl implements IUserSubscriptionService {
         log.debug("Updating subscription with id: {}", subscriptionDto.getId());
         UserSubscription subscription = findSubscription(subscriptionDto.getId());
         subscription.setPlanName(subscriptionDto.getPlanName());
+        subscription.setPlanCode(subscriptionDto.getPlanCode());
+        subscription.setPlanLevel(subscriptionDto.getPlanLevel());
+        subscription.setMealsPerMonth(subscriptionDto.getMealsPerMonth());
         subscription.setStartDate(subscriptionDto.getStartDate());
         subscription.setEndDate(subscriptionDto.getEndDate());
         subscriptionRepository.save(subscription);

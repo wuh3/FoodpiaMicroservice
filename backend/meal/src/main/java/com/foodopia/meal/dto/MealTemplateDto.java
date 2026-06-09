@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -18,4 +20,8 @@ public class MealTemplateDto {
 
     @Positive(message = "Total dishes must be greater than zero")
     private int totalDishes;
+
+    private List<String> requiredTags = new ArrayList<>();
+
+    private List<String> forbiddenTags = new ArrayList<>();
 }

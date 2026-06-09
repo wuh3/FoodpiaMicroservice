@@ -58,3 +58,7 @@ info:
     name: ${spring.application.name}
     description: "Foodopia Customer Service"
     version: "0.0.1-SNAPSHOT"
+
+foodopia:
+  meal-service:
+    url: ${MEAL_SERVICE_URL:http://localhost:8082}

@@ -5,10 +5,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import com.foodopia.meal.entity.Dish;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "meal_templates")
@@ -25,6 +25,12 @@ public class MealTemplate {
     private Map<String, Integer> dishCategories;
     private int totalDishes;
 
+    @Field("required_tags")
+    private List<String> requiredTags = new ArrayList<>();
+
+    @Field("forbidden_tags")
+    private List<String> forbiddenTags = new ArrayList<>();
+
     // Validate if a meal matches this template
     public boolean validateMeal(List<Dish> dishes) {
         if (dishes.size() != totalDishes) return false;
@@ -40,6 +46,14 @@ public class MealTemplate {
             if (!actualCount.equals(requiredCount.longValue())) {
                 return false;
             }
+        }
+
+        List<String> required = requiredTags != null ? requiredTags : List.of();
+        List<String> forbidden = forbiddenTags != null ? forbiddenTags : List.of();
+        for (Dish dish : dishes) {
+            List<String> tags = dish.getDietaryTags() != null ? dish.getDietaryTags() : List.of();
+            if (!tags.containsAll(required)) return false;
+            if (tags.stream().anyMatch(forbidden::contains)) return false;
         }
 
         return true;

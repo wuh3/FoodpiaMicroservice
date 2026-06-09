@@ -36,6 +36,16 @@ public class UserSubscription extends AuditableDocument {
     @Field("plan_name")
     private String planName;
 
+    @Field("plan_code")
+    @Indexed
+    private String planCode;
+
+    @Field("plan_level")
+    private int planLevel;
+
+    @Field("meals_per_month")
+    private int mealsPerMonth;
+
     @Field("status")
     @Indexed
     private SubscriptionStatus status;

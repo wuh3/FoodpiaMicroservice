@@ -11,6 +11,9 @@ public final class UserSubscriptionMapper {
         dto.setId(subscription.getId());
         dto.setUserId(subscription.getUserId());
         dto.setPlanName(subscription.getPlanName());
+        dto.setPlanCode(subscription.getPlanCode());
+        dto.setPlanLevel(subscription.getPlanLevel());
+        dto.setMealsPerMonth(subscription.getMealsPerMonth());
         dto.setStatus(subscription.getStatus());
         dto.setStartDate(subscription.getStartDate());
         dto.setEndDate(subscription.getEndDate());
@@ -22,6 +25,9 @@ public final class UserSubscriptionMapper {
     public static UserSubscription mapToEntity(UserSubscriptionDto dto, UserSubscription subscription) {
         subscription.setUserId(dto.getUserId());
         subscription.setPlanName(dto.getPlanName());
+        subscription.setPlanCode(dto.getPlanCode());
+        subscription.setPlanLevel(dto.getPlanLevel());
+        subscription.setMealsPerMonth(dto.getMealsPerMonth());
         subscription.setStatus(dto.getStatus());
         subscription.setStartDate(dto.getStartDate());
         subscription.setEndDate(dto.getEndDate());
