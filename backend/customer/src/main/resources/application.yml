@@ -13,7 +13,7 @@ spring:
         name: customer-mcp-server
         version: 1.0.0
         type: SYNC
-        instructions: "MCP server for Foodopia customer profiles and subscriptions"
+        instructions: "MCP server for Foodopia customer profiles and meal plan subscriptions (planCode, planLevel, mealsPerMonth)"
         protocol: STREAMABLE
         capabilities:
           tool: true

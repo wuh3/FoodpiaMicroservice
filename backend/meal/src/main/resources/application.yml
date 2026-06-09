@@ -14,7 +14,7 @@ spring:
         name: meal-mcp-server
         version: 1.0.0
         type: SYNC
-        instructions: "MCP server for the Foodopia meal catalog (dishes and ingredients)"
+        instructions: "MCP server for the Foodopia meal catalog (dishes, ingredients, meal templates, and meal plan types)"
         protocol: STREAMABLE
         capabilities:
           tool: true

@@ -68,6 +68,22 @@ public class UserSubscriptionServiceImpl implements IUserSubscriptionService {
     }
 
     @Override
+    public List<UserSubscriptionDto> fetchSubscriptionsByPlanCode(String planCode) {
+        log.debug("Fetching subscriptions for planCode: {}", planCode);
+        return subscriptionRepository.findByPlanCode(planCode).stream()
+                .map(sub -> UserSubscriptionMapper.mapToDto(sub, new UserSubscriptionDto()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserSubscriptionDto> fetchActiveSubscriptionsByUserId(String userId) {
+        log.debug("Fetching active subscriptions for userId: {}", userId);
+        return subscriptionRepository.findByUserIdAndStatus(userId, SubscriptionStatus.ACTIVE).stream()
+                .map(sub -> UserSubscriptionMapper.mapToDto(sub, new UserSubscriptionDto()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public boolean updateSubscription(UserSubscriptionDto subscriptionDto) {
         log.debug("Updating subscription with id: {}", subscriptionDto.getId());
         UserSubscription subscription = findSubscription(subscriptionDto.getId());

@@ -12,6 +12,10 @@ public interface IUserSubscriptionService {
 
     List<UserSubscriptionDto> fetchSubscriptionsByUserId(String userId);
 
+    List<UserSubscriptionDto> fetchSubscriptionsByPlanCode(String planCode);
+
+    List<UserSubscriptionDto> fetchActiveSubscriptionsByUserId(String userId);
+
     boolean updateSubscription(UserSubscriptionDto subscriptionDto);
 
     void pauseSubscription(String subscriptionId);
