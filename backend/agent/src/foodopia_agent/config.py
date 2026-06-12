@@ -40,6 +40,9 @@ class Settings(BaseSettings):
         validation_alias="CUSTOMER_SERVICE_URL",
     )
 
+    mcp_timeout_seconds: float = Field(default=30.0, validation_alias="MCP_TIMEOUT_SECONDS")
+    mcp_connect_on_startup: bool = Field(default=True, validation_alias="MCP_CONNECT_ON_STARTUP")
+
 
 @lru_cache
 def get_settings() -> Settings:

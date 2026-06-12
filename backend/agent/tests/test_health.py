@@ -8,7 +8,8 @@ from foodopia_agent.main import create_app
 
 def test_health():
     app = create_app(
-        Settings(openai_api_key=SecretStr("test-key"))
+        Settings(openai_api_key=SecretStr("test-key")),
+        connect_mcp=False,
     )
     client = TestClient(app)
 
