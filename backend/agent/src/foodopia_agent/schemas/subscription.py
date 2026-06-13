@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydantic import Field
-
 from foodopia_agent.schemas.common import JavaDto
 from foodopia_agent.schemas.customer import UserSubscriptionDto
 from foodopia_agent.schemas.meal import MealPlanTypeDto, MealTemplateDto, PlanLevelDto

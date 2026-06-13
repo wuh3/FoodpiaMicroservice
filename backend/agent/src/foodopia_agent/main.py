@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from foodopia_agent.clients.mcp import FoodopiaMcpGateway
 from foodopia_agent.config import Settings, get_settings
 from foodopia_agent.exceptions.mcp import McpConnectionError
+from foodopia_agent.routers.recommendation import router as recommendation_router
 from foodopia_agent.tools.mcp_tools import FoodopiaMcpTools
 
 logger = logging.getLogger(__name__)
@@ -84,7 +85,7 @@ def create_app(
 
     @app.get("/health/ready", tags=["health"])
     async def readiness() -> dict[str, Any]:
-        mcp_connected = app.state.mcp is not None
+        mcp_connected = getattr(app.state, "mcp", None) is not None
         return {
             "status": "READY" if mcp_connected or not settings.mcp_connect_on_startup else "DEGRADED",
             "service": settings.app_name,
@@ -101,6 +102,8 @@ def create_app(
             "service": settings.app_name,
             "docs": "/docs",
         }
+
+    app.include_router(recommendation_router)
 
     return app
 
