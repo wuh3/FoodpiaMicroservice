@@ -23,11 +23,11 @@ class Settings(BaseSettings):
     openai_model: str = Field(default="gpt-4o-mini", validation_alias="OPENAI_MODEL")
 
     meal_mcp_url: str = Field(
-        default="http://localhost:8082/mcp",
+        default="http://localhost:8082/sse",
         validation_alias="MEAL_MCP_URL",
     )
     customer_mcp_url: str = Field(
-        default="http://localhost:8083/mcp",
+        default="http://localhost:8083/sse",
         validation_alias="CUSTOMER_MCP_URL",
     )
 

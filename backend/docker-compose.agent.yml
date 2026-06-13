@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  agent-service:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    image: ${AGENT_IMAGE:-foodopia-agent:latest}
+    container_name: foodopia-agent-service
+    env_file:
+      - ./agent/.env
+    ports:
+      - "8090:8090"
+    environment:
+      APP_NAME: "foodopia-agent-service"
+      HOST: "0.0.0.0"
+      PORT: 8090
+      DEBUG: ${AGENT_DEBUG:-false}
+
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+
+      MEAL_MCP_URL: ${MEAL_MCP_URL:-http://meal-service:8082/sse}
+      CUSTOMER_MCP_URL: ${CUSTOMER_MCP_URL:-http://customer-service:8083/sse}
+      MEAL_SERVICE_URL: ${MEAL_SERVICE_URL:-http://meal-service:8082}
+      CUSTOMER_SERVICE_URL: ${CUSTOMER_SERVICE_URL:-http://customer-service:8083}
+
+      MCP_TIMEOUT_SECONDS: ${MCP_TIMEOUT_SECONDS:-30}
+      MCP_CONNECT_ON_STARTUP: ${MCP_CONNECT_ON_STARTUP:-true}
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8090/health | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 25s

@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 logs/
 scripts/
+BOOT-INF/
 
 ### STS ###
 .apt_generated

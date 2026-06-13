@@ -8,7 +8,7 @@ from contextlib import AsyncExitStack
 from typing import Any
 
 from mcp import ClientSession, types
-from mcp.client.streamable_http import streamable_http_client
+from mcp.client.sse import sse_client
 
 from foodopia_agent.exceptions.mcp import McpConnectionError, McpToolError
 
@@ -57,7 +57,7 @@ def _format_error_content(content: list[types.ContentBlock]) -> str:
 
 
 class McpServerClient:
-    """Single-server MCP client using streamable HTTP transport."""
+    """Single-server MCP client using SSE transport (Spring AI 1.0 webmvc)."""
 
     def __init__(self, name: str, url: str, timeout_seconds: float = 30.0):
         self.name = name
@@ -78,8 +78,12 @@ class McpServerClient:
 
         stack = AsyncExitStack()
         try:
-            read_stream, write_stream, _ = await stack.enter_async_context(
-                streamable_http_client(self.url, timeout=self.timeout_seconds) # Use stdio_client if plans to connect via stdio
+            read_stream, write_stream = await stack.enter_async_context(
+                sse_client(
+                    self.url,
+                    timeout=self.timeout_seconds,
+                    sse_read_timeout=300.0,
+                )
             )
             session = await stack.enter_async_context(ClientSession(read_stream, write_stream))
             await session.initialize()
